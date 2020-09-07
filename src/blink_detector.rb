@@ -11,8 +11,8 @@ class BlinkDetector
 
   def detect
     log("Running OpenFace FeatureExtraction on #{video_path}")
-    feature_extraction_csv = run_openface_feature_extraction
-    compute_blinks(feature_extraction_csv)
+    feature_extraction_analysis_dir = run_openface_feature_extraction
+    compute_blinks(feature_extraction_analysis_dir)
   end
 
   private
@@ -44,13 +44,19 @@ class BlinkDetector
 
     log("FeatureExtraction analysis file written to #{out_dir}")
 
-    "#{out_dir}/#{video_name}.csv"
+    out_dir
   end
 
-  def compute_blinks(feature_extraction_csv)
+  def compute_blinks(feature_extraction_analysis_dir)
+    feature_extraction_csv = "#{feature_extraction_analysis_dir.split('/').last}.csv"
+
     log("Computing blinks from #{feature_extraction_csv}")
 
-    blink_action_units = CSV.foreach(feature_extraction_csv, headers: true, header_converters: :symbol).map do |row|
+    blink_action_units = CSV.foreach(
+      File.join(feature_extraction_analysis_dir, feature_extraction_csv),
+      headers: true,
+      header_converters: :symbol
+    ).map do |row|
       row[BLINK_ACTION_UNIT_INDEX].strip.to_f
     end
 
@@ -68,7 +74,16 @@ class BlinkDetector
 
     log("Number of blinks: #{blinks}")
 
+    write_blink_analysis(feature_extraction_analysis_dir, blinks)
+
     blinks
+  end
+
+  def write_blink_analysis(dir, blinks)
+    CSV.open(File.join(dir, "blinks.csv"), "w") do |csv|
+      csv << ["blinks"]
+      csv << [blinks]
+    end
   end
 
   def log(str)
