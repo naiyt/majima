@@ -4,8 +4,9 @@ require "pry"
 require "pry-nav"
 
 class BlinkDetector
-  def initialize(video_path)
+  def initialize(video_path, visualize = false)
     @video_path = video_path
+    @visualize = visualize
   end
 
   def detect
@@ -16,7 +17,7 @@ class BlinkDetector
 
   private
 
-  attr_reader :video_path
+  attr_reader :video_path, :visualize
 
   FEATURE_EXTRACTION_PATH = "/home/openface-build/build/bin/FeatureExtraction".freeze
   BLINK_ACTION_UNIT_INDEX = :au45_c # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
@@ -24,7 +25,16 @@ class BlinkDetector
   def run_openface_feature_extraction
     video_name = video_path.split("/").last.split(".").first
     out_dir = "analysis_out/#{video_name}"
-    cmd = "#{FEATURE_EXTRACTION_PATH} -f #{video_path} -aus -out_dir #{out_dir}"
+
+    switches = [
+      "-f #{video_path}",
+      "-out_dir #{out_dir}",
+      "-aus",
+    ]
+    switches << "-vis-aus" if visualize
+    cmd = "#{FEATURE_EXTRACTION_PATH} #{switches.join(' ')}"
+
+    log("Running cmd #{cmd}")
 
     Open3.popen3(cmd) do |_stdin, stdout, _stderr, _thread|
       while (line = stdout.gets)
