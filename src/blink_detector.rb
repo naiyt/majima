@@ -40,11 +40,25 @@ class BlinkDetector
   def compute_blinks(feature_extraction_csv)
     log("Computing blinks from #{feature_extraction_csv}")
 
-    blinked_frames = CSV.foreach(feature_extraction_csv, headers: true, header_converters: :symbol).count do |row|
-      row[BLINK_ACTION_UNIT_INDEX].strip.to_f == 1.0
+    blink_action_units = CSV.foreach(feature_extraction_csv, headers: true, header_converters: :symbol).map do |row|
+      row[BLINK_ACTION_UNIT_INDEX].strip.to_f
     end
 
-    log("Frames with blinks: #{blinked_frames}")
+    blinks = 0
+    currently_blinking = false
+
+    blink_action_units.each do |au|
+      if currently_blinking && au != 1.0
+        currently_blinking = false
+      elsif !currently_blinking && au == 1.0
+        currently_blinking = true
+        blinks += 1
+      end
+    end
+
+    log("Number of blinks: #{blinks}")
+
+    blinks
   end
 
   def log(str)
