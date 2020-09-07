@@ -1,4 +1,7 @@
 require "open3"
+require "csv"
+require "pry"
+require "pry-nav"
 
 class BlinkDetector
   def initialize(video_path)
@@ -7,7 +10,8 @@ class BlinkDetector
 
   def detect
     log("Running OpenFace FeatureExtraction on #{video_path}")
-    run_openface_feature_extraction
+    feature_extraction_csv = run_openface_feature_extraction
+    compute_blinks(feature_extraction_csv)
   end
 
   private
@@ -15,10 +19,12 @@ class BlinkDetector
   attr_reader :video_path
 
   FEATURE_EXTRACTION_PATH = "/home/openface-build/build/bin/FeatureExtraction".freeze
+  BLINK_ACTION_UNIT_INDEX = :au45_c # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
 
   def run_openface_feature_extraction
     video_name = video_path.split("/").last.split(".").first
-    cmd = "#{FEATURE_EXTRACTION_PATH} -f #{video_path} -aus -out_dir analysis_out/#{video_name}"
+    out_dir = "analysis_out/#{video_name}"
+    cmd = "#{FEATURE_EXTRACTION_PATH} -f #{video_path} -aus -out_dir #{out_dir}"
 
     Open3.popen3(cmd) do |_stdin, stdout, _stderr, _thread|
       while (line = stdout.gets)
@@ -26,7 +32,19 @@ class BlinkDetector
       end
     end
 
-    log("Analysis file written to analysis_out/#{video_name}")
+    log("FeatureExtraction analysis file written to #{out_dir}")
+
+    "#{out_dir}/#{video_name}.csv"
+  end
+
+  def compute_blinks(feature_extraction_csv)
+    log("Computing blinks from #{feature_extraction_csv}")
+
+    blinked_frames = CSV.foreach(feature_extraction_csv, headers: true, header_converters: :symbol).count do |row|
+      row[BLINK_ACTION_UNIT_INDEX].strip.to_f == 1.0
+    end
+
+    log("Frames with blinks: #{blinked_frames}")
   end
 
   def log(str)
