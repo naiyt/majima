@@ -3,16 +3,15 @@
 require "listen"
 require "./blink_detector.rb"
 
+# TODO: spaces in the video filename breaks things
 def run_detector(video_path)
   BlinkDetector.new(video_path, ARGV[0] == "true").detect # TODO: better command line args
 
-  # Delete the video to clean up after ourselves
-  File.delete(video_path)
+  File.rename(video_path, File.join("video_out", video_path.split("/").last))
 end
 
 # Run for all the existing files once, before starting the listener
-# TODO: support multiple video types
-Dir["./video_in/*.mov"].each do |video|
+Dir["./video_in/*.mov", "./video_in/*.mkv", "./video_in/*.mp4"].each do |video|
   run_detector(video)
 end
 
