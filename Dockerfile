@@ -15,6 +15,8 @@ WORKDIR /home/majima
 COPY ./src ./src
 WORKDIR /home/majima/src
 RUN bundle install
-WORKDIR /home/majima
 
-ENTRYPOINT [ "/bin/bash" ]
+# The base OpenFace image uses an ENTRYPOINT which causes issues.
+# See: https://stackoverflow.com/questions/41207522/docker-override-or-remove-entrypoint-from-a-base-image
+ENTRYPOINT ["/usr/bin/env"]
+CMD ["./one_eyed_daemon.rb"]

@@ -1,3 +1,5 @@
+#!/usr/local/bin/ruby
+
 require "listen"
 require "./blink_detector.rb"
 
