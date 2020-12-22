@@ -29,10 +29,13 @@ class BlinkDetector
 
     log("Running cmd #{FEATURE_EXTRACTION_PATH} #{switches.join(' ')}")
 
-    `#{FEATURE_EXTRACTION_PATH} #{switches.join(' ')}`
-    # TODO: I would rather do this in order to get the output streaming, but it seems to kill the process early?
-    # Process.run(FEATURE_EXTRACTION_PATH, switches) do |proc|
-    #   while line = (proc.output.gets || proc.error.gets)
+    output = `#{FEATURE_EXTRACTION_PATH} #{switches.join(' ')}`
+    puts output
+    # TODO: This freeses after reading the triangulation? It would be preferable to use something like this, to stream the output
+    # reader, writer = IO.pipe
+    # Process.run(FEATURE_EXTRACTION_PATH, switches, shell: true, output: writer) do |process|
+    #   until process.terminated?
+    #     line = reader.gets
     #     puts line
     #   end
     # end

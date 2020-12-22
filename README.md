@@ -12,6 +12,7 @@ TODO:
 - Fix the absolute paths in the blink detector
 - Can I setup a file listener daemon, like I did in Ruby?
 - Full analysis:
+  - Time processing
   - Calculate amount of time a face is visible
   - Calculate blinks / minute, adjusted by how long the face is visible
   - Calculate amount of time eyes are closed
