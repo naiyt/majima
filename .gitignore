@@ -3,3 +3,4 @@
 *.avi
 *.mkv
 src/analysis_out/
+.DS_Store
