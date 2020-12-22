@@ -15,7 +15,7 @@ class BlinkDetector
   # TODO: these absolute paths shouldn't be hardcoded like this, too dependent on the Docker setup
   private FEATURE_EXTRACTION_PATH = "/home/openface-build/build/bin/FeatureExtraction"
   private OUTDIR_PATH             = "/home/majima/src/analysis_out"
-  private BLINK_ACTION_UNIT_INDEX = "AU45_c" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
+  private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
 
   private def run_openface_feature_extraction : String
     video_name = video_path.split("/").last.split(".").first
@@ -62,9 +62,9 @@ class BlinkDetector
     currently_blinking = false
 
     blink_action_units.each do |au|
-      if currently_blinking && au != 1.0
+      if currently_blinking && au == 0.0
         currently_blinking = false
-      elsif !currently_blinking && au == 1.0
+      elsif !currently_blinking && au > 0.0
         currently_blinking = true
         blinks += 1
       end
