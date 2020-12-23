@@ -1,16 +1,14 @@
 fish:
 
-docker run -it --rm -v (pwd)/src:/home/majima/src:delegated --name majima majima
+docker run -it --rm -v (pwd):/home/majima:delegated --name majima majima
 
 Other shells:
 
-docker run -it --rm -v \$(pwd)/src:/home/majima/src:delegated --name majima majima
+docker run -it --rm -v \$(pwd):/home/majima:delegated --name majima majima
 
 TODO:
 
 - Figure out why I can't use Process.run properly to stream output
-- Fix the absolute paths in the blink detector
-- Can I setup a file listener daemon, like I did in Ruby?
 - Full analysis:
   - Time processing
   - Calculate amount of time a face is visible

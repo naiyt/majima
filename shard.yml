@@ -2,7 +2,7 @@ name: majima
 version: 0.1.0
 
 crystalline:
-  main: ./src/blink_detector.cr
+  main: ./src/one_eyed_daemon.cr
 # authors:
 #   - name <email@example.com>
 
