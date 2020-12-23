@@ -1,9 +1,11 @@
 class BlinkAnalyzer
   private getter csv : Hash(String, Array(Float64)), feature_extraction_analysis_dir : String
   @time_on_camera : Float64?
-  @total_blinks : Int32?
+  @blink_lengths : Array(Float64)?
 
   private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
+  private MAX_BLINK_LENGTH        = 5        # Past this, and your eyes are probably just closed
+  private MIN_BLINK_LENGTH        = 0
 
   def initialize(@feature_extraction_analysis_dir : String) : Nil
     feature_extraction_csv = "#{feature_extraction_analysis_dir.split('/').last}.csv"
@@ -28,10 +30,15 @@ class BlinkAnalyzer
 
   def analyze : Nil
     analysis = {
-      "Total blinks":    total_blinks,
-      "Length":          "#{video_length}s",
-      "Time on camera":  "#{time_on_camera}s, Time off camera: #{video_length - time_on_camera}s",
-      "Blinks / minute": "#{blinks_per_minute}",
+      "Total blinks":           total_blinks,
+      "Length":                 "#{video_length}s",
+      "Time on camera":         "#{time_on_camera}s, Time off camera: #{video_length - time_on_camera}s",
+      "Blinks / minute":        "#{blinks_per_minute}",
+      "Average Blink":          "#{average_blink_length}",
+      "Median Blink":           "#{median_blink_length}",
+      "Blink Length Std. Dev.": "#{stddev_blink_length}",
+      "Longest Blink":          "#{longest_blink}",
+      "Shorted Blink":          "#{shortest_blink}",
     }
 
     log("ANALYSIS:")
@@ -46,21 +53,50 @@ class BlinkAnalyzer
   end
 
   private def total_blinks : Int32
-    @total_blinks ||= begin
-      blinks = 0
-      currently_blinking = false
+    blink_lengths.size
+  end
 
-      csv[BLINK_ACTION_UNIT_INDEX].each do |au|
+  private def blink_lengths : Array(Float64)
+    @blink_lengths ||= begin
+      blinks = [] of Float64
+
+      currently_blinking = false
+      start_timestamp = 0.0
+
+      csv[BLINK_ACTION_UNIT_INDEX].each_with_index do |au, i|
         if currently_blinking && au == 0.0
           currently_blinking = false
+          blinks << csv["timestamp"][i - 1] - start_timestamp
         elsif !currently_blinking && au > 0.0
           currently_blinking = true
-          blinks += 1
+          start_timestamp = csv["timestamp"][i]
         end
       end
 
-      blinks
+      blinks.select { |b| b > MIN_BLINK_LENGTH && b < MAX_BLINK_LENGTH }
     end
+  end
+
+  private def average_blink_length : Float64
+    blink_lengths.sum / blink_lengths.size
+  end
+
+  private def median_blink_length : Float64
+    blink_lengths.sort[(blink_lengths.size / 2).to_i]
+  end
+
+  private def stddev_blink_length : Float64
+    average = average_blink_length
+    deviations = blink_lengths.map { |l| (l - average) ** 2 }
+    Math.sqrt(deviations.sum / deviations.size)
+  end
+
+  private def longest_blink : Float64
+    blink_lengths.max
+  end
+
+  private def shortest_blink : Float64
+    blink_lengths.min
   end
 
   private def blinks_per_minute : Float64
