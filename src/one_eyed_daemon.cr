@@ -1,4 +1,5 @@
 require "./blink_detector.cr"
+require "./blink_analyzer.cr"
 require "./logger.cr"
 
 file_types = ["*.mov", "*.mkv", "*.mp4"]
@@ -6,7 +7,11 @@ file_paths = file_types.map { |type| File.join(ENV["MAJIMA_PATH"], "data", "vide
 
 loop do
   Dir[file_paths].each do |video_path|
-    BlinkDetector.new(video_path).detect
+    log("Running OpenFace FeatureExtraction on #{video_path}")
+    feature_extraction_analysis_dir = BlinkDetector.detect(video_path)
+
+    log("Running analysis on the OpenFace FeatureExtraction written to #{feature_extraction_analysis_dir}")
+    BlinkAnalyzer.new(feature_extraction_analysis_dir).analyze
 
     video_name = video_path.split("/").last
     new_path = File.join(ENV["MAJIMA_PATH"], "data", "video_out", video_name)

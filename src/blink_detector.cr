@@ -2,21 +2,9 @@ require "csv"
 require "./logger.cr"
 
 class BlinkDetector
-  getter video_path
+  private OUTDIR_PATH = File.join(ENV["MAJIMA_PATH"], "/data/analysis_out")
 
-  def initialize(@video_path : String) : Nil
-  end
-
-  def detect : Nil
-    log("Running OpenFace FeatureExtraction on #{video_path}")
-    feature_extraction_analysis_dir = run_openface_feature_extraction
-    compute_blinks(feature_extraction_analysis_dir)
-  end
-
-  private OUTDIR_PATH             = File.join(ENV["MAJIMA_PATH"], "/data/analysis_out")
-  private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
-
-  private def run_openface_feature_extraction : String
+  def self.detect(video_path : String) : String
     video_name = video_path.split("/").last.split(".").first
     out_dir = [OUTDIR_PATH, video_name].join("/")
 
@@ -42,42 +30,5 @@ class BlinkDetector
     log("FeatureExtraction analysis file written to #{out_dir}")
 
     out_dir
-  end
-
-  private def compute_blinks(feature_extraction_analysis_dir : String) : Nil
-    feature_extraction_csv = "#{feature_extraction_analysis_dir.split('/').last}.csv"
-
-    log("Computing blinks from #{feature_extraction_csv}")
-
-    blink_action_units : Array(Float64) = [] of Float64
-
-    File.open(File.join(feature_extraction_analysis_dir, feature_extraction_csv)) do |csv|
-      CSV.new(csv, headers: true).each do |row|
-        blink_action_units << row[BLINK_ACTION_UNIT_INDEX].strip.to_f
-      end
-    end
-
-    blinks = 0
-    currently_blinking = false
-
-    blink_action_units.each do |au|
-      if currently_blinking && au == 0.0
-        currently_blinking = false
-      elsif !currently_blinking && au > 0.0
-        currently_blinking = true
-        blinks += 1
-      end
-    end
-
-    log("Number of blinks: #{blinks}")
-
-    write_blink_analysis(feature_extraction_analysis_dir, blinks)
-  end
-
-  private def write_blink_analysis(dir, blinks)
-    CSV.build(File.new(filename: File.join(dir, "blinks.csv"), mode: "w")) do |csv|
-      csv.row ["blinks"]
-      csv.row [blinks]
-    end
   end
 end
