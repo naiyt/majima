@@ -1,11 +1,11 @@
 class BlinkAnalyzer
-  private getter csv : Hash(String, Array(Float64))
+  private getter csv : Hash(String, Array(Float64)), feature_extraction_analysis_dir : String
   @time_on_camera : Float64?
   @total_blinks : Int32?
 
   private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
 
-  def initialize(feature_extraction_analysis_dir : String) : Nil
+  def initialize(@feature_extraction_analysis_dir : String) : Nil
     feature_extraction_csv = "#{feature_extraction_analysis_dir.split('/').last}.csv"
 
     # This loads the CSV into a hash where the key is the column name and the value is that column.
@@ -27,11 +27,22 @@ class BlinkAnalyzer
   end
 
   def analyze : Nil
+    analysis = {
+      "Total blinks":    total_blinks,
+      "Length":          "#{video_length}s",
+      "Time on camera":  "#{time_on_camera}s, Time off camera: #{video_length - time_on_camera}s",
+      "Blinks / minute": "#{blinks_per_minute}",
+    }
+
     log("ANALYSIS:")
-    log("Total blinks: #{total_blinks}")
-    log("Length: #{video_length}s")
-    log("Time on camera: #{time_on_camera}s, Time off camera: #{video_length - time_on_camera}s")
-    log("Blinks / minute: #{blinks_per_minute}")
+
+    File.open(File.join(feature_extraction_analysis_dir, "analysis.txt"), "w") do |f|
+      analysis.each do |k, v|
+        str = "#{k}: #{v}"
+        f << str + "\n"
+        log(str)
+      end
+    end
   end
 
   private def total_blinks : Int32
