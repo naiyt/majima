@@ -14,7 +14,7 @@ class BlinkDetector
 
   # TODO: these absolute paths shouldn't be hardcoded like this, too dependent on the Docker setup
   private FEATURE_EXTRACTION_PATH = "/home/openface-build/build/bin/FeatureExtraction"
-  private OUTDIR_PATH             = "/home/majima/src/analysis_out"
+  private OUTDIR_PATH             = "/home/majima/data/analysis_out"
   private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
 
   private def run_openface_feature_extraction : String
@@ -89,9 +89,9 @@ end
 
 # TODO: listen functionality, like I had in Ruby?
 Dir[
-  "/home/majima/src/video_in/*.mov",
-  "/home/majima/src/video_in/*.mkv",
-  "/home/majima/src/video_in/*.mp4",
+  "/home/majima/data/video_in/*.mov",
+  "/home/majima/data/video_in/*.mkv",
+  "/home/majima/data/video_in/*.mp4",
 ].each do |video|
   BlinkDetector.new(video).detect
 end

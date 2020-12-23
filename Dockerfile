@@ -9,6 +9,7 @@ RUN apt-get install crystal -y
 # Setup and compile the tool
 WORKDIR /home/majima
 COPY ./src ./src
+COPY ./data ./data
 WORKDIR /home/majima
 
 ENTRYPOINT ["/usr/bin/env"]

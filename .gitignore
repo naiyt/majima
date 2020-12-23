@@ -2,5 +2,5 @@
 *.mp4
 *.avi
 *.mkv
-src/analysis_out/
+data/analysis_out/
 .DS_Store
