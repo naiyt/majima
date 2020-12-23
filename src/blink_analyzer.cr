@@ -8,10 +8,11 @@ class BlinkAnalyzer
   def initialize(feature_extraction_analysis_dir : String) : Nil
     feature_extraction_csv = "#{feature_extraction_analysis_dir.split('/').last}.csv"
 
-    # This leads the CSV into a hash where the key is the column name and the value is that column.
+    # This loads the CSV into a hash where the key is the column name and the value is that column.
     # This isn't ideal, because it loads the entire CSV into memory, and duplicates the column headers,
-    # so it could be rough on memory for really big CSVs. I did this for now, because the Crystal CSV
-    # API is really barebones and difficult to work with.
+    # so it could be rough on memory for big CSVs. I did it this way (for now) because the Crystal CSV
+    # API is really barebones and difficult to work with. Might have to refactor it if it becomes a memory
+    # issue.
     @csv = {} of String => Array(Float64)
     File.open(File.join(feature_extraction_analysis_dir, feature_extraction_csv)) do |csv|
       csv = CSV.new(csv, headers: true)
@@ -63,21 +64,16 @@ class BlinkAnalyzer
     @time_on_camera ||= begin
       time = 0.0
 
-      first_success_index = 0
-      csv["success"].each_with_index do |success, index|
-        if success
-          first_success_index = index
-          break
-        end
-      end
+      # Find the first frame in which a face is on the camera
+      first_success_index = (0...csv["success"].size).find(0) { |i| csv["success"][i] == 1.0 }
 
+      # Extract and add up each subsection where a face is actually on camera
       start_timestamp = csv["timestamp"][first_success_index]
       currently_on_camera = true
 
       csv["timestamp"][first_success_index + 1..].each_with_index do |timestamp, i|
         if currently_on_camera && csv["success"][i] != 1.0
-          end_timestamp = csv["timestamp"][i - 1]
-          time += end_timestamp - start_timestamp
+          time += csv["timestamp"][i - 1] - start_timestamp
           currently_on_camera = false
         elsif !currently_on_camera && csv["success"][i] == 1.0
           start_timestamp = timestamp
@@ -85,10 +81,8 @@ class BlinkAnalyzer
         end
       end
 
-      if csv["success"][-1] == 1.0
-        end_timestamp = csv["timestamp"][-1]
-        time += end_timestamp - start_timestamp
-      end
+      # Clean up the final subsection, if the video ended with us still on camera
+      time += csv["timestamp"][-1] - start_timestamp if csv["success"][-1] == 1.0
 
       time
     end
