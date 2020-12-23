@@ -1,4 +1,5 @@
 require "csv"
+require "./logger.cr"
 
 class BlinkDetector
   getter video_path
@@ -78,9 +79,5 @@ class BlinkDetector
       csv.row ["blinks"]
       csv.row [blinks]
     end
-  end
-
-  private def log(str : String) : Nil
-    puts "[BLINK DETECTOR] #{str}"
   end
 end
