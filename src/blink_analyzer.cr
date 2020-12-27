@@ -4,7 +4,7 @@ class BlinkAnalyzer
   @blink_lengths : Array(Float64)?
 
   private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
-  private MAX_BLINK_LENGTH        = 5        # Past this, and your eyes are probably just closed
+  private MAX_BLINK_LENGTH        = 2        # Past this, and your eyes are probably just closed
   private MIN_BLINK_LENGTH        = 0
 
   def initialize(@feature_extraction_analysis_dir : String) : Nil
