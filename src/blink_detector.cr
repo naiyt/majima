@@ -16,8 +16,13 @@ class BlinkDetector
 
     log("Running cmd #{ENV["OPENFACE_EXECUTABLE_PATH"]} #{switches.join(' ')}")
 
-    output = `#{ENV["OPENFACE_EXECUTABLE_PATH"]} #{switches.join(' ')}`
-    puts output
+    start = Time.local
+
+    elapsed_time = Time.measure do
+      output = `#{ENV["OPENFACE_EXECUTABLE_PATH"]} #{switches.join(' ')}`
+      puts output
+    end
+
     # TODO: This freeses after reading the triangulation? It would be preferable to use something like this, to stream the output
     # reader, writer = IO.pipe
     # Process.run(FEATURE_EXTRACTION_PATH, switches, shell: true, output: writer) do |process|
@@ -27,6 +32,7 @@ class BlinkDetector
     #   end
     # end
 
+    log("Feature extraction execution time: #{elapsed_time}")
     log("FeatureExtraction analysis file written to #{out_dir}")
 
     out_dir

@@ -4,8 +4,9 @@ class BlinkAnalyzer
   @blink_lengths : Array(Float64)?
 
   private BLINK_ACTION_UNIT_INDEX = "AU45_r" # https://en.wikipedia.org/wiki/Facial_Action_Coding_System
-  private MAX_BLINK_LENGTH        = 2        # Past this, and your eyes are probably just closed
-  private MIN_BLINK_LENGTH        = 0
+  private MAX_BLINK_LENGTH        =   2      # Past this, and your eyes are probably just closed
+  private MIN_BLINK_LENGTH        =   0
+  private ACTION_UNIT_LOWER_BOUND = 0.2
 
   def initialize(@feature_extraction_analysis_dir : String) : Nil
     feature_extraction_csv = "#{feature_extraction_analysis_dir.split('/').last}.csv"
@@ -64,10 +65,10 @@ class BlinkAnalyzer
       start_timestamp = 0.0
 
       csv[BLINK_ACTION_UNIT_INDEX].each_with_index do |au, i|
-        if currently_blinking && au == 0.0
+        if currently_blinking && au < ACTION_UNIT_LOWER_BOUND
           currently_blinking = false
           blinks << csv["timestamp"][i - 1] - start_timestamp
-        elsif !currently_blinking && au > 0.0
+        elsif !currently_blinking && au >= ACTION_UNIT_LOWER_BOUND
           currently_blinking = true
           start_timestamp = csv["timestamp"][i]
         end
