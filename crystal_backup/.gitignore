@@ -1,0 +1,6 @@
+*.mov
+*.mp4
+*.avi
+*.mkv
+data/analysis_out/
+.DS_Store

@@ -1,17 +1,24 @@
-fish:
+# README
 
-docker run -it --rm -v (pwd):/home/majima:delegated --name majima majima
+This README would normally document whatever steps are necessary to get the
+application up and running.
 
-To just analyze an already generated OpenFace extraction:
+Things you may want to cover:
 
-docker run -it --rm -v (pwd):/home/majima:delegated -e ANALYZE=<out dir name> --name majima majima
+* Ruby version
 
-Other shells:
+* System dependencies
 
-docker run -it --rm -v \$(pwd):/home/majima:delegated --name majima majima
+* Configuration
 
-TODO:
+* Database creation
 
-- Figure out why I can't use Process.run properly to stream output
-- Figure out live streaming
-- Setup on home server
+* Database initialization
+
+* How to run the test suite
+
+* Services (job queues, cache servers, search engines, etc.)
+
+* Deployment instructions
+
+* ...
