@@ -3,7 +3,9 @@ require "./blink_analyzer.cr"
 require "./logger.cr"
 
 def run_daemon
-  file_types = ["*.mov", "*.mkv", "*.mp4"]
+  log("Waiting for video files...")
+
+  file_types = ["*.mov", "*.mkv", "*.mp4", "*.webm"]
   file_paths = file_types.map { |type| File.join(ENV["MAJIMA_PATH"], "data", "video_in", type) }
 
   loop do
