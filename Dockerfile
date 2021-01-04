@@ -13,10 +13,15 @@ RUN rm -r ruby-build
 
 
 # Install Dependencies
+
+RUN apt install software-properties-common -y
+# Needed for ffmpeg
+RUN add-apt-repository ppa:mc3man/trusty-media -y
 RUN apt-get update && apt-get install -y \
   curl \
   build-essential \
   libpq-dev \
+  ffmpeg \
   postgresql-client &&\
   curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
