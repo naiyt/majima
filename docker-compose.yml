@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+
+  webpacker:
+    build: .
+    command: ./bin/webpack-dev-server
+    volumes:
+      - .:/majima
+    ports:
+      - "3035:3035"
+    environment:
+      NODE_ENV: development
+      RAILS_ENV: development
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/majima
+    ports:
+      - "3000:3000"
+    environment:
+      WEBPACKER_DEV_SERVER_HOST: webpacker
+    depends_on:
+      - db
+      - webpacker
