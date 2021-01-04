@@ -5,6 +5,7 @@ import videojs from "video.js";
 import RecordRTC from "recordrtc";
 import "videojs-record/dist/css/videojs.record.css";
 import Record from "videojs-record/dist/videojs.record";
+import * as Rails from "@rails/ujs";
 
 export default class extends Controller {
   private videoJSoptions = {
@@ -21,7 +22,7 @@ export default class extends Controller {
         image: false,
         audio: false,
         video: true,
-        maxLength: 60 * 5,
+        maxLength: 60 * 2,
         debug: true,
       },
     },
@@ -55,7 +56,22 @@ export default class extends Controller {
 
     player.on("finishRecord", function () {
       console.log("finished recording: ", (player as any).recordedData);
-      (player as any).record().saveAs({ video: "blinking.webm" });
+
+      const data = (player as any).recordedData;
+      const serverUrl = "/videos";
+      const formData = new FormData();
+      formData.append("video_file", data, data.name);
+
+      fetch(serverUrl, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRF-Token": Rails.csrfToken()!,
+        },
+      })
+        .then((success) => console.log("video uploaded"))
+        .catch((error) => console.error("failed to upload"));
+
       player.record().reset();
     });
   }
