@@ -3,7 +3,7 @@ require "open3"
 module BlinkDetection
   module Detector
     def self.detect(video)
-      out_dir = Rails.root.join("tmp", video.video_file.key)
+      out_dir = Rails.root.join("storage", "video_analyses", video.video_file.key)
 
       switches = ["-f #{video.file_path}", "-out_dir #{out_dir}", "-aus"]
 
