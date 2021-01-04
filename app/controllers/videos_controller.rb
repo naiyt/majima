@@ -22,6 +22,7 @@ class VideosController < ApplicationController
     @video = Video.new(video_params)
 
     if @video.save
+      @video.start_blink_detection_job
       redirect_to @video, notice: "Video was successfully created."
     else
       render :new
