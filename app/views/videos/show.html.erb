@@ -1,4 +1,8 @@
 <p id="notice"><%= notice %></p>
 
+<video controls>
+  <source src=<%= url_for(@video.video_file) %> type="video/webm">
+</video>
+
 <%= link_to 'Edit', edit_video_path(@video) %> |
 <%= link_to 'Back', videos_path %>
