@@ -33,7 +33,7 @@ services:
     volumes:
       - .:/majima
     ports:
-      - "3035:3035"
+      - "3036:3036"
     environment:
       NODE_ENV: development
       RAILS_ENV: development
