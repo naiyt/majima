@@ -97,7 +97,7 @@ module BlinkDetection
 
     attr_reader :video
 
-    MAX_BLINK_LENGTH = 2
+    MAX_BLINK_LENGTH = 1
     MIN_BLINK_LENGTH = 0
     ACTION_UNIT_LOWER_BOUND = 0.2
   end
