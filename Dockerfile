@@ -39,7 +39,7 @@ COPY . /majima
 COPY bin/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
-EXPOSE 3000
+EXPOSE 4000
 
 ENV OPENFACE_EXECUTABLE_PATH /home/openface-build/build/bin/FeatureExtraction
 
