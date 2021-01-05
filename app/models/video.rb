@@ -18,4 +18,8 @@ class Video < ApplicationRecord
   def start_blink_detection_job
     BlinkDetectionJob.perform_later(id)
   end
+
+  def analyzer
+    @analyzer ||= BlinkDetection::Analyzer.new(self)
+  end
 end
