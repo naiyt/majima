@@ -1,10 +1,15 @@
+require "fileutils"
+
 class BlinkDetectionJob < ApplicationJob
   queue_as :default
 
   def perform(video_id)
     video = Video.find(video_id)
 
-    BlinkDetection::Detector.detect(video)
+    out_dir = BlinkDetection::FeatureExtraction.extract(video)
+    BlinkDetection::FrameDumper.dump(video, out_dir)
+
+    FileUtils.remove_dir(out_dir)
 
     video.update!(status: Video::PROCESSED)
   rescue => e

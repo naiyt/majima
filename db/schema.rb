@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_05_022344) do
+ActiveRecord::Schema.define(version: 2021_01_05_031931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,15 +47,16 @@ ActiveRecord::Schema.define(version: 2021_01_05_022344) do
     t.integer "frame", null: false
     t.integer "face_id", null: false
     t.float "timestamp", null: false
-    t.integer "confidence", null: false
+    t.float "confidence", null: false
     t.boolean "success", null: false
-    t.integer "AU45_r", null: false
-    t.integer "AU45_c", null: false
+    t.float "au45_r", null: false
+    t.float "au45_c", null: false
     t.bigint "video_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["AU45_c"], name: "index_frames_on_AU45_c"
-    t.index ["AU45_r"], name: "index_frames_on_AU45_r"
+    t.datetime "created_at", precision: 6, default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", precision: 6, default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["au45_c"], name: "index_frames_on_au45_c"
+    t.index ["au45_r"], name: "index_frames_on_au45_r"
+    t.index ["frame", "video_id"], name: "index_frames_on_frame_and_video_id", unique: true
     t.index ["success"], name: "index_frames_on_success"
     t.index ["video_id"], name: "index_frames_on_video_id"
   end

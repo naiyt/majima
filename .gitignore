@@ -39,3 +39,6 @@ yarn-debug.log*
 
 crystal_backup/data/
 *.webm
+*.mkv
+*.mp4
+*.mp3
