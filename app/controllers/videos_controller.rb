@@ -20,12 +20,13 @@ class VideosController < ApplicationController
   # POST /videos
   def create
     @video = Video.new(video_params)
+    @video.status = Video::PROCESSING
 
     if @video.save
       @video.start_blink_detection_job
-      redirect_to @video, notice: "Video was successfully created."
+      render json: { success: true, id: @video.id }
     else
-      render :new
+      render json: { errors: @video.errors }, status: :unprocessable_entity
     end
   end
 
