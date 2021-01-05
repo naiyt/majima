@@ -53,6 +53,6 @@ class VideosController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def video_params
-    params.permit(:video_file)
+    params.permit(:video_file, :started_recording_at)
   end
 end

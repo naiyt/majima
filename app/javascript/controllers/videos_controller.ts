@@ -46,11 +46,14 @@ export default class extends Controller {
       videojs.log(msg);
     }) as any;
 
+    let startedRecordingAt: Date;
+
     player.on("ready", function () {
       player.record().getDevice();
     });
 
     player.on("deviceReady", function () {
+      startedRecordingAt = new Date();
       player.record().start();
     });
 
@@ -61,6 +64,7 @@ export default class extends Controller {
       const serverUrl = "/videos";
       const formData = new FormData();
       formData.append("video_file", data, data.name);
+      formData.append("started_recording_at", startedRecordingAt.toISOString());
 
       fetch(serverUrl, {
         method: "POST",
