@@ -90,6 +90,7 @@ module BlinkDetection
     end
 
     def blinks_per_minute
+      return 0 if time_on_camera == 0
       blinks.length / (time_on_camera / 60)
     end
 
