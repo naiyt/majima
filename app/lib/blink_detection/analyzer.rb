@@ -64,6 +64,7 @@ module BlinkDetection
     end
 
     def average_blink_length
+      return 0 if blinks.size == 0
       blinks.sum / blinks.size
     end
 
@@ -72,6 +73,7 @@ module BlinkDetection
     end
 
     def stddev_blink_length
+      return 0 if blinks.size == 0
       average = average_blink_length
       deviations = blinks.map { |l| (l - average)**2 }
       Math.sqrt(deviations.sum / deviations.size)
