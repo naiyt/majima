@@ -40,6 +40,8 @@ module BlinkDetection
           # Find the first frame in which a face is on the camera
           first_success_index = (0...frames.count).find { |i| frames[i].success }
 
+          return 0 if first_success_index.nil?
+
           # Extract and add up each subsection where a face is actually on camera
           start_timestamp = frames[first_success_index].timestamp
           currently_on_camera = true
